@@ -1,57 +1,50 @@
+# Tic Tac Toe Game in Python
 
----
-
-### ✅ `tic_tac_toe.py` (copy this Python code)
-
-```python
 def print_board(board):
-    print(f"\n{board[0]} | {board[1]} | {board[2]}")
-    print("--+---+--")
-    print(f"{board[3]} | {board[4]} | {board[5]}")
-    print("--+---+--")
-    print(f"{board[6]} | {board[7]} | {board[8]}\n")
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 9)
 
 def check_winner(board, player):
-    combos = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
-        [0, 4, 8], [2, 4, 6]              # Diagonals
-    ]
-    return any(all(board[i] == player for i in combo) for combo in combos)
+    # Check rows, columns and diagonals
+    for row in board:
+        if all([cell == player for cell in row]):
+            return True
+    for col in range(3):
+        if all([board[row][col] == player for row in range(3)]):
+            return True
+    if all([board[i][i] == player for i in range(3)]) or \
+       all([board[i][2 - i] == player for i in range(3)]):
+        return True
+    return False
 
-def is_full(board):
-    return all(cell in ["X", "O"] for cell in board)
+def is_draw(board):
+    return all([cell in ['X', 'O'] for row in board for cell in row])
 
 def main():
-    board = [str(i+1) for i in range(9)]
+    board = [[" " for _ in range(3)] for _ in range(3)]
     current_player = "X"
 
     while True:
         print_board(board)
-        move = input(f"Player {current_player}, enter your move (1-9): ")
-
-        if not move.isdigit() or int(move) < 1 or int(move) > 9:
-            print("Invalid input. Try again.")
-            continue
-
-        move = int(move) - 1
-        if board[move] in ["X", "O"]:
-            print("Cell already taken. Try another.")
-            continue
-
-        board[move] = current_player
-
-        if check_winner(board, current_player):
-            print_board(board)
-            print(f"🎉 Player {current_player} wins!")
-            break
-
-        if is_full(board):
-            print_board(board)
-            print("It's a tie!")
-            break
-
-        current_player = "O" if current_player == "X" else "X"
+        try:
+            row = int(input(f"Player {current_player}, enter row (0-2): "))
+            col = int(input(f"Player {current_player}, enter column (0-2): "))
+            if board[row][col] == " ":
+                board[row][col] = current_player
+                if check_winner(board, current_player):
+                    print_board(board)
+                    print(f"🎉 Player {current_player} wins!")
+                    break
+                elif is_draw(board):
+                    print_board(board)
+                    print("🤝 It's a draw!")
+                    break
+                current_player = "O" if current_player == "X" else "X"
+            else:
+                print("Cell already taken. Try again.")
+        except (ValueError, IndexError):
+            print("Invalid input. Enter numbers between 0 and 2.")
 
 if __name__ == "__main__":
     main()
